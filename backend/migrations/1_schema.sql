@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS videos;
+
+CREATE TABLE IF NOT EXISTS videos (
+	name TEXT NOT NULL,
+	word TEXT NOT NULL
+);
