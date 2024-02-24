@@ -1,74 +1,69 @@
+mod database;
+
 use axum::{
     extract::{Query, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::get,
+    routing::{get, post},
     Json, Router,
+};
+use database::{
+    add_new_quote, add_new_song, get_album_by_name, get_all_albums, get_all_quotes, get_all_songs,
+    get_quote_by_name, get_random_quote, get_song_by_name, Album, Quote, Song,
 };
 use serde_json::json;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use tower_http::services::{ServeDir, ServeFile};
 
-async fn add_new_video(
+async fn add_quote_handler(
     Query(query): Query<HashMap<String, String>>,
     State(state): State<DatabaseState>,
-) -> Result<impl IntoResponse, impl IntoResponse> {
-    if !query.contains_key("name") || !query.contains_key("word") {
+) -> Result<impl IntoResponse, (StatusCode, &'static str)> {
+    if !query.contains_key("album") || !query.contains_key("song") || !query.contains_key("quote") {
         return Err((StatusCode::BAD_REQUEST, "Missing query parameters"));
     }
 
-    let name = query.get("name").unwrap();
-    let word = query.get("word").unwrap();
+    let album_name = query.get("album").unwrap();
+    let song_name = query.get("song").unwrap();
+    let quote_name = query.get("quote").unwrap();
 
-    match sqlx::query(
-        r#"
-        INSERT INTO videos (name, word)
-        SELECT $1, $2
-        WHERE NOT EXISTS (
-            SELECT 1 FROM videos WHERE name = $1 AND word = $2
-        );
-        "#,
-    )
-    .bind(name)
-    .bind(word)
-    .execute(&state.pool)
-    .await
-    {
-        Ok(_) => {}
-        Err(e) => {
-            println!("Failed to add video: {:?}", e);
-            return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to add video"));
-        }
-    }
+    let album = get_album_by_name(&state.pool, album_name).await.unwrap();
+    add_new_song(&state.pool, album.id, song_name).await;
+    let song = get_song_by_name(&state.pool, album.id, song_name)
+        .await
+        .unwrap();
+    add_new_quote(&state.pool, song.id, quote_name).await;
+    let quote = get_quote_by_name(&state.pool, song.id, quote_name)
+        .await
+        .unwrap();
 
     Ok(Json(json!({
-        "name": name.to_string(),
-        "word": word.to_string(),
+        "success": true,
+        "quote": quote,
+        "album": album,
+        "song": song
     })))
 }
 
-async fn get_videos(State(state): State<DatabaseState>) -> Json<HashMap<String, Vec<String>>> {
-    let videos = sqlx::query_as::<_, (String, String)>(
-        r#"
-        SELECT DISTINCT name, word FROM videos;
-        "#,
-    )
-    .fetch_all(&state.pool)
-    .await
-    .expect("Failed to fetch videos");
+async fn get_albums_handler(State(state): State<DatabaseState>) -> Json<Vec<Album>> {
+    let albums = get_all_albums(&state.pool).await;
+    Json(albums)
+}
 
-    println!("{:?}", videos);
-    let mut result: HashMap<String, Vec<String>> = HashMap::new();
-    for (name, word) in videos {
-        if result.contains_key(&name) {
-            result.get_mut(&name).unwrap().push(word);
-        } else {
-            result.insert(name, vec![word]);
-        }
-    }
+async fn get_songs_handler(State(state): State<DatabaseState>) -> Json<Vec<Song>> {
+    let songs = get_all_songs(&state.pool).await;
+    Json(songs)
+}
 
-    Json(result)
+async fn get_quotes_handler(State(state): State<DatabaseState>) -> Json<Vec<Quote>> {
+    let quotes = get_all_quotes(&state.pool).await;
+    Json(quotes)
+}
+
+async fn get_random_quote_handler(State(state): State<DatabaseState>) -> Json<Quote> {
+    let quote = get_random_quote(&state.pool).await;
+    Json(quote)
 }
 
 /// Database state
@@ -89,8 +84,12 @@ async fn main(#[shuttle_shared_db::Postgres] db: PgPool) -> shuttle_axum::Shuttl
             "/",
             ServeDir::new("assets").not_found_service(ServeFile::new("assets/index.html")),
         )
-        .route("/add", get(add_new_video))
-        .route("/get", get(get_videos))
+        .route("/get/albums", get(get_albums_handler))
+        .route("/get/songs", get(get_songs_handler))
+        .route("/add/quote", get(add_quote_handler))
+        .route("/add/quote", post(add_quote_handler))
+        .route("/get/quote", get(get_quotes_handler))
+        .route("/get/random/quote", get(get_random_quote_handler))
         .with_state(state);
 
     Ok(router.into())

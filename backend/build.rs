@@ -63,5 +63,6 @@ fn main() -> Result<(), i32> {
     // }
     // // println!("cargo:rerun-if-changed={fe_path}");
     // // println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=migrations");
     Ok(())
 }
