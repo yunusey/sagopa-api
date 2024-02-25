@@ -1,5 +1,5 @@
 [package]
-name = "shuttle-yew-experiment-backend"
+name = "sagopa-api-backend"
 version = "0.1.0"
 edition = "2021"
 

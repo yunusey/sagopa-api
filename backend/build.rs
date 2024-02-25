@@ -45,24 +45,16 @@ fn main() -> Result<(), i32> {
         .to_owned();
 
     let mut cmd = Command::new("trunk");
-    cmd.args([
-        "build",
-        "-d",
-        &assets_path,
-        "--filehash",
-        "false",
-        &path_to_html,
-    ]);
+    cmd.args(["build", "-d", &assets_path, &path_to_html]);
     if Ok("release".to_owned()) == env::var("PROFILE") {
         cmd.arg("--release");
     }
-    cmd.status().map(|s| s.success()).unwrap_or_else(|_| false);
-    // match cmd.status().map(|s| s.success()) {
-    //     Ok(false) | Err(_) => return Err(1),
-    //     _ => {}
-    // }
-    // // println!("cargo:rerun-if-changed={fe_path}");
-    // // println!("cargo:rerun-if-changed=build.rs");
+    match cmd.status().map(|s| s.success()) {
+        Ok(false) | Err(_) => return Err(1),
+        _ => {}
+    }
+    println!("cargo:rerun-if-changed={}", frontend_path.to_str().unwrap());
+    println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=migrations");
     Ok(())
 }

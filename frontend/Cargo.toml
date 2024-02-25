@@ -1,8 +1,18 @@
 [package]
-name = "shuttle-yew-experiment-frontend"
+name = "sagopa-api-frontend"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 yew = { version = "0.20.0", features = ["csr"] }
 yew-router = "0.17.0"
+gloo = "0.8.0"
+log = "0.4.17"
+serde = { version = "1.0.160", features = ["derive"] }
+web-sys = { version = "0.3.60", features = [
+    "HtmlInputElement", 
+	"HtmlSelectElement", 
+	"HtmlButtonElement", 
+	"HtmlElement", 
+	"CssStyleDeclaration"
+] }
