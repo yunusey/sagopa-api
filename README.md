@@ -1,12 +1,15 @@
 # Sagopa API
 
-Yes, you read that right. This is an API I've written in [Shuttle](https://www.shuttle.rs/) with [Axum](https://axum.rs/) and [Yew](https://yew.rs/).
+**THIS PROJECT IS NOT AFFILIATED WITH SAGOPA KAJMER! IT IS A FAN WORK.**
+
+## Introduction
+Yes, you read that right. This is an API I've written in [Shuttle](https://www.shuttle.rs/) with [Axum](https://axum.rs/) and [Yew](https://yew.rs/) that returns quotes from Sagopa Kajmer's songs!
 
 ## Why?
-I am not a web developer, but sometimes I need to do some API calls, and that [Lorem Ipsum](https://www.lipsum.com/) is too **boring**. As a huge fan of [Sagopa Kajmer](https://www.youtube.com/channel/UC-7fJF4x8vV7Ynyp47h-Zow), I thought why not just create one myself containing some quotes of him while learning awesome frameworks like Yew, Axum, and Shuttle.
+I am not a web developer, but sometimes I need to make some API calls, and that [Lorem Ipsum](https://www.lipsum.com/) is way too **boring**. As a huge fan of [Sagopa Kajmer](https://www.youtube.com/channel/UC-7fJF4x8vV7Ynyp47h-Zow), I thought why not just create an API myself consisting of well-written quotes of him while learning awesome frameworks like Yew, Axum, and Shuttle.
 
 ## How do you use it?
-I am planning to leave several examples for some languages to use it in the future, but basically, you just make a REST API call and you are good to go.
+I am planning to leave several examples for some languages to use the API in the future, but basically, you just make a REST API call and you are good to go.
 
 _PS: You probably don't care about `id`, `album_id`, and `song_id` field. So, just ignore them!_
 
@@ -82,11 +85,9 @@ Response:
 ```
 
 ## Contributing?
-
 You want to contribute? You're awesome! Well, if you want to contribute to the source code, you can explore the code, open issues, create PRs, whatever you want. If you want to contribute to the service by adding quotes, which I would really appreciate, the only thing you need to do is to listen to more, go to [Sagopa API](https://sagopa-api.shuttleapp.rs/), and enter your quotes! Yep, that's pretty much all.
 
 ## License
-
 Of course, this project is MIT licensed. Use it as you wish.
 
 ## Credits
